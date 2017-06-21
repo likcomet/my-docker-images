@@ -17,5 +17,6 @@ RUN touch /var/log/icecc.log /var/log/icecc-scheduler
 CMD if [ $ICECREAM_SCHEDULER == "yes" ]; then icecc-scheduler -d -l /var/log/icecc-scheduler; fi
 CMD iceccd -d -s $ICECREAM_SCHEDULER_HOST -l /var/log/icecc.log && tail -f /var/log/icecc.log
 ADD ./Enable-icecc-scheduler.sh /root/Enable-icecc-scheduler.sh
+RUN chmod 755 /root/Enable-icecc-scheduler.sh
 ENTRYPOINT /root/Enable-icecc-scheduler.sh
 EXPOSE 10245/tcp 8765/tcp 8766/tcp 8765/udp
