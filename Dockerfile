@@ -14,6 +14,6 @@ RUN make
 RUN make install
 ENV PATH "/home/icecc/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
 RUN touch /var/log/icecc.log /var/log/icecc-scheduler
-CMD if [ $ICECREAM_SCHEDULER == yes ]; then icecc-scheduler -d -l /var/log/icecc-scheduler; fi
+CMD if [ $ICECREAM_SCHEDULER == "yes" ]; then icecc-scheduler -d -l /var/log/icecc-scheduler; fi
 CMD iceccd -d -s $ICECREAM_SCHEDULER_HOST -l /var/log/icecc.log && tail -f /var/log/icecc.log
 EXPOSE 10245/tcp 8765/tcp 8766/tcp 8765/udp
