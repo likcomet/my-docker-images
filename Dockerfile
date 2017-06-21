@@ -1,52 +1,18 @@
-FROM php:5.6-apache
+FROM gcc:4.8
 
-
-# install the PHP extensions we need
-RUN set -ex; \
-	\
-	apt-get update; \
-	apt-get install -y \
-		libjpeg-dev \
-		libpng12-dev \
-	; \
-	rm -rf /var/lib/apt/lists/*; \
-	\
-	docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr; \
-	docker-php-ext-install gd mysqli opcache
-# TODO consider removing the *-dev deps and only keeping the necessary lib* packages
-
-# set recommended PHP.ini settings
-# see https://secure.php.net/manual/en/opcache.installation.php
-RUN { \
-		echo 'opcache.memory_consumption=128'; \
-		echo 'opcache.interned_strings_buffer=8'; \
-		echo 'opcache.max_accelerated_files=4000'; \
-		echo 'opcache.revalidate_freq=2'; \
-		echo 'opcache.fast_shutdown=1'; \
-		echo 'opcache.enable_cli=1'; \
-	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
-
-RUN touch /usr/local/etc/php/conf.d/upload-limit.ini \ 
-	&& echo "upload_max_filesize = 32M" >> /usr/local/etc/php/conf.d/upload-limit.ini \
-	&& echo "post_max_size = 32M" >> /usr/local/etc/php/conf.d/upload-limit.ini 
-
-
-RUN a2enmod rewrite expires headers
-
-VOLUME /var/www/html
-
-ENV WORDPRESS_VERSION 4.7
-ENV WORDPRESS_SHA1 1e14144c4db71421dc4ed22f94c3914dfc3b7020
-
-RUN set -ex; \
-	curl -o wordpress.tar.gz -fSL "https://wordpress.org/wordpress-${WORDPRESS_VERSION}.tar.gz"; \
-	echo "$WORDPRESS_SHA1 *wordpress.tar.gz" | sha1sum -c -; \
-# upstream tarballs include ./wordpress/ so this gives us /usr/src/wordpress
-	tar -xzf wordpress.tar.gz -C /usr/src/; \
-	rm wordpress.tar.gz; \
-	chown -R www-data:www-data /usr/src/wordpress
-
-COPY docker-entrypoint.sh /usr/local/bin/
-
-ENTRYPOINT ["docker-entrypoint.sh"]
-CMD ["apache2-foreground"]
+RUN useradd icecc
+WORKDIR /home/icecc
+RUN apt-get update
+RUN apt-get install -y libcap-ng-dev liblzo2-dev git docbook2x
+RUN git clone https://github.com/icecc/icecream.git
+RUN echo "192.168.11.141  updateproxy.neople.co.kr" >> /etc/hosts
+RUN echo 'Acquire::http::proxy "http://updateproxy.neople.co.kr:9999/";' > /etc/apt/apt.conf.d/80proxy 
+WORKDIR icecream
+RUN ./autogen.sh
+RUN ./configure
+RUN make
+RUN make install
+ENV PATH "/home/icecc/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
+RUN touch /var/log/icecc.log
+CMD iceccd -d -s 192.168.20.171 -l /var/log/icecc.log && tail -f /var/log/icecc.log
+EXPOSE 10245/tcp 8765/tcp 8766/tcp 8765/udp
