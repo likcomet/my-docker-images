@@ -14,8 +14,10 @@ RUN make
 RUN make install
 ENV PATH "/home/icecc/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
 RUN touch /var/log/icecc.log /var/log/icecc-scheduler
-CMD iceccd -d -s $ICECREAM_SCHEDULER_HOST -l /var/log/icecc.log && tail -f /var/log/icecc.log
+#CMD iceccd -d -s $ICECREAM_SCHEDULER_HOST -l /var/log/icecc.log && tail -f /var/log/icecc.log
 ADD ./Enable-icecc-scheduler.sh /root/Enable-icecc-scheduler.sh
 RUN chmod 755 /root/Enable-icecc-scheduler.sh
-ENTRYPOINT /root/Enable-icecc-scheduler.sh
+CMD /root/Enable-icecc-scheduler.sh
+#CMD /root/Enable-icecc-scheduler.sh
 EXPOSE 10245/tcp 8765/tcp 8766/tcp 8765/udp
+#ENTRYPOINT /root/Enable-icecc-scheduler.sh
