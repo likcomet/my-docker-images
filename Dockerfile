@@ -3,10 +3,10 @@ FROM gcc:4.8
 RUN useradd icecc
 WORKDIR /home/icecc
 RUN cp -p /usr/share/zoneinfo/Asia/Seoul /etc/localtime
-RUN echo 'Acquire::http::proxy "http://updateproxy.neople.co.kr:9999/";' > /etc/apt/apt.conf.d/80proxy
 RUN apt-get update
-RUN apt-get install -y libcap-ng-dev liblzo2-dev git docbook2x
 #RUN echo "192.168.11.141  updateproxy.neople.co.kr" >> /etc/hosts
+RUN echo 'Acquire::http::proxy "http://updateproxy.neople.co.kr:9999/";' > /etc/apt/apt.conf.d/80proxy
+RUN apt-get install -y libcap-ng-dev liblzo2-dev git docbook2x
 RUN git config --global http.proxy http://updateproxy.neople.co.kr:9999
 RUN git config --global https.proxy http://updateproxy.neople.co.kr:9999
 RUN git config --global url."https://".insteadOf git://
