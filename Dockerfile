@@ -1,6 +1,8 @@
 FROM gcc:4.8
 
 RUN useradd icecc
+RUN alias ll="ls -al"
+RUN alias vi="ls -al"
 WORKDIR /home/icecc
 RUN cp -p /usr/share/zoneinfo/Asia/Seoul /etc/localtime
 #ENV ProxyMode=`ping -c 1 -w 1 updateproxy.neople.co.kr | grep % | cut -f3 -d"," | cut -f2 -d" " | cut -c1-1 `
@@ -13,7 +15,7 @@ RUN if [ "`ping -c 1 -w 1 updateproxy.neople.co.kr | grep % | cut -f3 -d"," | cu
     git config --global url."http://".insteadOf git://; fi
 
 RUN apt-get update
-RUN apt-get install -y libcap-ng-dev liblzo2-dev git docbook2x
+RUN apt-get install -y libcap-ng-dev liblzo2-dev git docbook2x vim locales
 RUN git clone https://github.com/icecc/icecream.git
 WORKDIR icecream
 RUN ./autogen.sh
